@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pibble Reciclador - Lecciones Ecológicas</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js for sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fredoka', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        pibble: {
+                            orange: '#ff7043',
+                            vest: '#84cc16',
+                            brown: '#8d6e63',
+                            cream: '#fbe9e7',
+                            dark: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        h1, h2, h3, .font-fun {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Background Themes */
+        body.theme-slate { background-color: #020617; color: #f8fafc; }
+        body.theme-emerald { background-color: #022c22; color: #ecfdf5; }
+        body.theme-ocean { background-color: #0b192c; color: #f0f9ff; }
+        body.theme-sunset { background-color: #1a0b2e; color: #fdf4ff; }
+        body.theme-amber { background-color: #1c100b; color: #fffbeb; }
+
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(18deg); }
+        }
+        .animate-wag {
+            transform-origin: bottom center;
+            animation: tailWag 0.5s infinite ease-in-out;
+        }
+        @keyframes floatCute {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-pibble-float {
+            animation: floatCute 3.2s infinite ease-in-out;
+        }
+        @keyframes earTwitch {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            95% { transform: rotate(-6deg); }
+        }
+        .animate-ear-left {
+            transform-origin: bottom right;
+            animation: earTwitch 4s infinite ease-in-out;
+        }
+        @keyframes catTailWhip {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-25deg); }
+        }
+        .animate-cat-tail {
+            transform-origin: bottom right;
+            animation: catTailWhip 0.4s infinite ease-in-out;
+        }
+        @keyframes heartUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
+        }
+        .floating-heart {
+            position: absolute;
+            animation: heartUp 1.2s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes pulseRedAlert {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            50% { shadow: 0 0 25px 12px rgba(244, 63, 94, 0.7); }
+        }
+        .cat-alert-glow {
+            animation: pulseRedAlert 1.2s infinite ease-in-out;
+        }
+        @keyframes surpriseShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-8px, 5px) rotate(-3deg); }
+            40% { transform: translate(8px, -5px) rotate(3deg); }
+            60% { transform: translate(-6px, -3px) rotate(-2deg); }
+            80% { transform: translate(6px, 3px) rotate(2deg); }
+        }
+        .animate-shake {
+            animation: surpriseShake 0.5s ease-in-out;
+        }
+        .option-btn {
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.01);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 px-4 py-3 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('quiz')">
+                <div id="hero-avatar-icon" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-lime-400 to-emerald-400 flex items-center justify-center text-slate-950 font-bold text-2xl shadow-lg border border-amber-300/40 transform hover:rotate-6 transition">
+                    🐶
+                </div>
+                <div>
+                    <h1 id="app-title-header" class="text-xl md:text-2xl font-bold bg-gradient-to-r from-amber-400 via-lime-300 to-emerald-400 bg-clip-text text-transparent leading-none">
+                        Pibble Reciclador
+                    </h1>
+                    <p id="app-subtitle-header" class="text-xs text-slate-400 font-medium">¡Enseña a tu perrito a cuidar el planeta!</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="flex items-center gap-3 bg-slate-950/80 px-4 py-2 rounded-2xl border border-slate-800 text-xs md:text-sm shadow-inner">
+                <div class="flex items-center gap-2" title="Sabiduría del perrito">
+                    <i class="fa-solid fa-graduation-cap text-amber-400 text-base"></i>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-semibold leading-tight">Sabiduría</span>
+                        <span id="stat-knowledge" class="font-bold text-amber-300">0 %</span>
+                    </div>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800"></div>
+                <div class="flex items-center gap-2" title="Huesitos Eco Ganados">
+                    <i class="fa-solid fa-bone text-lime-400 text-base"></i>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-semibold leading-tight">Huesitos</span>
+                        <span id="stat-bones" class="font-bold text-lime-300">0</span>
+                    </div>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800"></div>
+                <div class="flex items-center gap-2" title="Progreso Lección">
+                    <i class="fa-solid fa-circle-question text-sky-400 text-base"></i>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-semibold leading-tight">Progreso</span>
+                        <span id="stat-progress" class="font-bold text-sky-300">1/15</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs & Theme Selectors -->
+            <div class="flex items-center gap-2">
+                <div class="hidden sm:flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800" title="Cambiar color de fondo">
+                    <button onclick="setTheme('theme-slate')" class="w-6 h-6 rounded-lg bg-slate-900 border border-slate-700 hover:scale-110 transition" title="Noche Cósmica"></button>
+                    <button onclick="setTheme('theme-emerald')" class="w-6 h-6 rounded-lg bg-emerald-950 border border-emerald-600 hover:scale-110 transition" title="Bosque Esmeralda"></button>
+                    <button onclick="setTheme('theme-ocean')" class="w-6 h-6 rounded-lg bg-sky-950 border border-sky-600 hover:scale-110 transition" title="Océano Profundo"></button>
+                    <button onclick="setTheme('theme-sunset')" class="w-6 h-6 rounded-lg bg-purple-950 border border-purple-600 hover:scale-110 transition" title="Atardecer Mágico"></button>
+                </div>
+
+                <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                    <button onclick="switchTab('quiz')" id="tab-quiz" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2 bg-amber-500 text-slate-950 font-fun shadow">
+                        <i class="fa-solid fa-gamepad"></i> Enseñar
+                    </button>
+                    <button onclick="switchTab('notebook')" id="tab-notebook" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                        <i class="fa-solid fa-book"></i> Cuaderno
+                    </button>
+                    <button onclick="switchTab('wardrobe')" id="tab-wardrobe" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                        <i class="fa-solid fa-palette"></i> Armario
+                    </button>
+                    <button onclick="switchTab('ai-ask')" id="tab-ai-ask" class="px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Olfato IA
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-1 w-full flex flex-col justify-center">
+
+        <!-- VIEW 1: QUIZ GAME -->
+        <section id="view-quiz" class="flex flex-col gap-6">
+            
+            <!-- 15-Second Cat Challenge Timer Banner -->
+            <div id="cat-timer-banner" class="hidden bg-gradient-to-r from-rose-950 via-slate-900 to-amber-950 border-2 border-rose-500 rounded-2xl p-3 shadow-xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">😼⚡</span>
+                    <div>
+                        <h4 class="font-bold font-fun text-rose-400 text-sm md:text-base leading-tight">
+                            ¡¡ALERTA!! ¡¡EL GATO MISIFÚ APARECIÓ DE LA NADA!!
+                        </h4>
+                        <p class="text-xs text-rose-200">
+                            ¡Misifú dice mentiras para confundirnos! ¡Tienes 15 segundos para responder!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-xl border border-rose-500/50">
+                    <i class="fa-solid fa-stopwatch text-amber-400 text-lg animate-spin"></i>
+                    <span id="timer-seconds" class="font-bold text-xl font-fun text-amber-300 w-8 text-center">15</span>
+                    <span class="text-xs text-slate-400 font-semibold">seg</span>
+                </div>
+            </div>
+
+            <!-- Timer Progress Bar -->
+            <div id="timer-bar-container" class="hidden w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                <div id="timer-bar" class="bg-gradient-to-r from-amber-400 to-rose-500 h-full w-full transition-all duration-1000 linear"></div>
+            </div>
+
+            <!-- Pibble Stage Box -->
+            <div id="pibble-stage-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 transition-all duration-300">
+                
+                <div id="glow-circle-1" class="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div id="glow-circle-2" class="absolute -left-10 -top-10 w-64 h-64 bg-lime-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Stage Avatars Container -->
+                <div class="flex flex-row items-center justify-center gap-2 min-w-[210px] relative">
+                    
+                    <button onclick="toggleAudio()" title="Activar/desactivar sonido" class="absolute -top-2 -left-2 z-20 w-8 h-8 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs flex items-center justify-center hover:bg-slate-700 transition">
+                        <i id="icon-sound" class="fa-solid fa-volume-high"></i>
+                    </button>
+
+                    <!-- Interactive Dog SVG Avatar -->
+                    <div id="pibble-avatar-container" onclick="barkPibbleInteractive(event)" class="relative w-36 h-36 md:w-44 md:h-44 flex items-center justify-center animate-pibble-float cursor-pointer group" title="¡Haz clic para acariciar a tu perrito!">
+                        <div id="hearts-container" class="absolute inset-0 pointer-events-none z-30"></div>
+                        <div class="absolute -bottom-1 opacity-0 group-hover:opacity-100 transition duration-200 bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full shadow z-20 font-fun pointer-events-none">
+                            ¡Acaríciame! 🐾
+                        </div>
+                        <div id="dog-svg-wrapper" class="w-full h-full"></div>
+                    </div>
+
+                    <!-- Gato Misifú Vector SVG -->
+                    <div id="cat-avatar-container" onclick="meowCatInteractive(event)" class="hidden relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center cursor-pointer group" title="¡Haz clic en el Gato Misifú!">
+                        <div class="absolute -bottom-1 opacity-0 group-hover:opacity-100 transition duration-200 bg-rose-500 text-white font-bold text-[9px] px-2 py-0.5 rounded-full shadow z-20 font-fun pointer-events-none">
+                            ¡Miau! 😾
+                        </div>
+                        <svg viewBox="0 0 200 210" class="w-full h-full drop-shadow-2xl overflow-visible">
+                            <path class="animate-cat-tail" d="M 155 140 Q 185 110 175 80 Q 165 95 148 130 Z" fill="#334155" stroke="#1e293b" stroke-width="2" />
+                            <ellipse cx="100" cy="150" rx="38" ry="36" fill="#334155" />
+                            <ellipse cx="100" cy="152" rx="26" ry="24" fill="#475569" />
+                            <rect x="20" y="150" width="30" height="40" rx="4" fill="#64748b" transform="rotate(-65 20 150)"/>
+                            <text x="32" y="140" font-size="14">🗑️</text>
+                            <path d="M 52 75 C 52 40, 148 40, 148 75 C 152 110, 138 128, 100 130 C 62 128, 48 110, 52 75 Z" fill="#334155" stroke="#1e293b" stroke-width="2" />
+                            <polygon points="48,65 30,15 75,42" fill="#334155" stroke="#1e293b" stroke-width="2" />
+                            <polygon points="52,60 38,25 70,43" fill="#fda4af" />
+                            <polygon points="152,65 170,15 125,42" fill="#334155" stroke="#1e293b" stroke-width="2" />
+                            <polygon points="148,60 162,25 130,43" fill="#fda4af" />
+                            <ellipse cx="72" cy="74" rx="10" ry="12" fill="#facc15" transform="rotate(-10 72 74)"/>
+                            <ellipse cx="72" cy="74" rx="2.5" ry="9" fill="#020617" />
+                            <ellipse cx="128" cy="74" rx="10" ry="12" fill="#facc15" transform="rotate(10 128 74)"/>
+                            <ellipse cx="128" cy="74" rx="2.5" ry="9" fill="#020617" />
+                            <line x1="40" y1="88" x2="15" y2="82" stroke="#cbd5e1" stroke-width="2" />
+                            <line x1="40" y1="94" x2="18" y2="96" stroke="#cbd5e1" stroke-width="2" />
+                            <line x1="160" y1="88" x2="185" y2="82" stroke="#cbd5e1" stroke-width="2" />
+                            <line x1="160" y1="94" x2="182" y2="96" stroke="#cbd5e1" stroke-width="2" />
+                            <polygon points="96,88 104,88 100,94" fill="#f43f5e" />
+                            <path d="M 88 102 Q 95 96 100 100 Q 105 96 112 102" stroke="#020617" stroke-width="3" fill="none" stroke-linecap="round" />
+                        </svg>
+                    </div>
+
+                </div>
+
+                <!-- Mood Badge & Dialogue Bubble -->
+                <div class="flex-1 w-full bg-slate-950/90 border-2 border-amber-500/30 rounded-2xl p-5 relative shadow-inner flex flex-col justify-between">
+                    <div class="hidden md:block absolute -left-3 top-10 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-slate-950"></div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
+                            <span id="speaker-title" class="text-xs font-bold text-amber-400 font-fun uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-comment-dots"></i> <span id="speaker-name-label">Pibble te pregunta:</span>
+                            </span>
+                            <span id="question-category" class="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold border border-slate-700">
+                                Bienvenida
+                            </span>
+                        </div>
+
+                        <div id="cat-myth-box" class="hidden mb-3 p-3 rounded-xl bg-rose-950/60 border border-rose-500/50 text-xs md:text-sm text-rose-200 flex items-start gap-2">
+                            <span class="text-2xl">😼</span>
+                            <div>
+                                <span class="font-bold text-rose-300 font-fun block mb-0.5">El Gato Misifú se burla:</span>
+                                <span id="cat-myth-text">"¡Miau! Reciclar no sirve de nada, es mejor tirarlo todo a la calle..."</span>
+                            </div>
+                        </div>
+
+                        <p id="pibble-speech" class="text-base md:text-lg font-medium text-slate-100 leading-relaxed min-h-[64px]">
+                            <!-- Speech loaded dynamically -->
+                        </p>
+                    </div>
+
+                    <div id="pibble-learning-box" class="hidden mt-4 p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs md:text-sm text-amber-200">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Options Grid -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 md:p-6 shadow-xl">
+                <h3 id="options-title" class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-heart text-amber-400"></i> Ayuda a comenzar:
+                </h3>
+
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <div class="mt-6 flex items-center justify-between pt-4 border-t border-slate-800">
+                    <button onclick="resetGamePrompt()" class="text-xs text-slate-400 hover:text-slate-200 font-semibold transition flex items-center gap-1">
+                        <i class="fa-solid fa-rotate-left"></i> Reiniciar Lecciones
+                    </button>
+
+                    <button id="btn-next-question" onclick="nextQuestion()" class="hidden px-6 py-2.5 bg-gradient-to-r from-amber-500 to-lime-500 hover:from-amber-400 hover:to-lime-400 text-slate-950 font-bold font-fun rounded-xl transition shadow-lg transform hover:scale-105 flex items-center gap-2">
+                        Siguiente Lección <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- VIEW 2: PIBBLE'S ECO-NOTEBOOK -->
+        <section id="view-notebook" class="hidden flex flex-col gap-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl">
+                            📖
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold font-fun text-amber-300">Cuaderno de Lecciones Eco</h2>
+                            <p class="text-xs text-slate-400">Todo lo que tu perrito ha aprendido contigo sobre reciclar y cuidar la naturaleza.</p>
+                        </div>
+                    </div>
+                    <span id="notebook-count-badge" class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold">
+                        0 / 15 Lecciones
+                    </span>
+                </div>
+
+                <div id="notebook-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: CUSTOMIZATION, BREEDS & WARDROBE STORE -->
+        <section id="view-wardrobe" class="hidden flex flex-col gap-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-lime-500/10 border border-lime-500/30 text-lime-400 flex items-center justify-center text-2xl">
+                            🎨
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold font-fun text-lime-300">Estilo, Razas y Tienda Eco</h2>
+                            <p class="text-xs text-slate-400">Personaliza la raza, el color de pelaje, los disfraces y el fondo de la app.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-2xl border border-slate-800 text-lime-300 font-bold font-fun">
+                        <i class="fa-solid fa-bone text-lg"></i>
+                        <span id="wardrobe-bones-counter">0</span> Huesitos
+                    </div>
+                </div>
+
+                <!-- Section 1: Choose Dog Breed -->
+                <div class="mb-8">
+                    <h3 class="text-sm font-bold font-fun text-amber-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-dog"></i> 1. Selecciona la Raza de tu Perrito:
+                    </h3>
+                    <div id="breed-selector-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Section 2: Choose Fur Color & Background Theme -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
+                    <div>
+                        <h3 class="text-sm font-bold font-fun text-amber-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-paint-brush"></i> 2. Color de Pelaje:
+                        </h3>
+                        <div id="fur-color-grid" class="flex flex-wrap gap-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold font-fun text-amber-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-display"></i> 3. Color de Fondo de la App:
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <button onclick="setTheme('theme-slate')" class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold font-fun hover:border-amber-400 text-slate-200 transition text-left flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-slate-950 border border-slate-600"></span> Noche Cósmica
+                            </button>
+                            <button onclick="setTheme('theme-emerald')" class="p-2.5 rounded-xl bg-emerald-950 border border-emerald-700 text-xs font-bold font-fun hover:border-emerald-400 text-emerald-200 transition text-left flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-emerald-900 border border-emerald-500"></span> Bosque Esmeralda
+                            </button>
+                            <button onclick="setTheme('theme-ocean')" class="p-2.5 rounded-xl bg-sky-950 border border-sky-700 text-xs font-bold font-fun hover:border-sky-400 text-sky-200 transition text-left flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-sky-900 border border-sky-500"></span> Océano Profundo
+                            </button>
+                            <button onclick="setTheme('theme-sunset')" class="p-2.5 rounded-xl bg-purple-950 border border-purple-700 text-xs font-bold font-fun hover:border-purple-400 text-purple-200 transition text-left flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-purple-900 border border-purple-500"></span> Atardecer Mágico
+                            </button>
+                            <button onclick="setTheme('theme-amber')" class="p-2.5 rounded-xl bg-amber-950 border border-amber-700 text-xs font-bold font-fun hover:border-amber-400 text-amber-200 transition text-left flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-amber-900 border border-amber-500"></span> Cueva Cálida
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Wardrobe Items -->
+                <div>
+                    <h3 class="text-sm font-bold font-fun text-lime-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-shirt"></i> 4. Tienda de Disfraces y Accesorios Eco:
+                    </h3>
+                    <div id="wardrobe-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- VIEW 4: AI NOSE (GEMINI) -->
+        <section id="view-ai-ask" class="hidden flex flex-col gap-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl border border-amber-500/30">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div>
+                        <h2 id="ai-title-header" class="text-2xl font-bold font-fun text-amber-300">El Olfato IA del Perrito (Gemini)</h2>
+                        <p class="text-xs text-slate-400">¿Tienes un objeto raro en casa? Pregúntale a tu amigo canino para saber cómo reciclarlo.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <input type="text" id="ai-input" placeholder="Ej: Foco roto, caja de pizza grasosa, cepillo de dientes usado..." class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 text-white placeholder-slate-500">
+                    <button onclick="askPibbleAI()" id="btn-ai-submit" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-lime-500 hover:from-amber-400 hover:to-lime-400 text-slate-950 font-bold font-fun rounded-2xl transition shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-dog"></i> Olfatear Objeto
+                    </button>
+                </div>
+
+                <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span class="text-slate-400 font-semibold self-center">Probar objeto:</span>
+                    <button onclick="setAiInput('Tubo de crema dental')" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition">🪥 Tubo de crema dental</button>
+                    <button onclick="setAiInput('Espejo de vidrio roto')" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition">🪞 Espejo roto</button>
+                    <button onclick="setAiInput('Lata de atún vacía')" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition">🐟 Lata de atún</button>
+                </div>
+            </div>
+
+            <!-- AI Output Box -->
+            <div id="ai-output-card" class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 flex-1 min-h-[200px] flex flex-col justify-center items-center text-center">
+                <div id="ai-idle" class="max-w-md">
+                    <p class="text-4xl mb-2">🐶🔎</p>
+                    <p id="ai-idle-text" class="text-slate-400 text-sm">Escribe un objeto arriba y activaremos el Olfato Ecológico Inteligente.</p>
+                </div>
+                <div id="ai-loading" class="hidden flex flex-col items-center">
+                    <i class="fa-solid fa-circle-notch animate-spin text-4xl text-amber-400 mb-3"></i>
+                    <p id="ai-loading-text" class="text-slate-200 font-bold font-fun">Investigando con Olfato IA...</p>
+                </div>
+                <div id="ai-result" class="hidden text-left w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <!-- AI response loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-3 px-4 text-center text-xs text-slate-500">
+        <p>Pibble Reciclador &copy; 2026 - Juego Educativo sobre Reciclaje y Medio Ambiente.</p>
+    </footer>
+
+    <script>
+        // --- GAME STATE ---
+        let gameState = {
+            hasStarted: false,
+            currentQuestionIdx: 0,
+            ecoBones: 0,
+            unlockedFacts: [],
+            unlockedEquip: ['default'],
+            currentEquip: 'default',
+            audioEnabled: true,
+            // Breeds & Customization
+            currentBreed: 'pitbull',
+            currentFurColor: 'default',
+            currentTheme: 'theme-slate',
+            // Mood & Eyes
+            currentMood: 'welcome',
+            // Cat Encounter State
+            catActive: false,
+            timerSeconds: 15,
+            timerInterval: null
+        };
+
+        // Breed Database
+        const breedsDB = {
+            pitbull: {
+                id: 'pitbull',
+                name: 'Pibble',
+                breedTitle: 'Pitbull Reciclador',
+                emoji: '🐶',
+                furDefault: '#ffffff',
+                bellyDefault: '#fff1f2',
+                accentColor: '#fbcfe8',
+                desc: 'Valiente, cariñoso y el clásico reciclador de la ciudad.'
+            },
+            shiba: {
+                id: 'shiba',
+                name: 'Shiba',
+                breedTitle: 'Shiba Inu Reciclador',
+                emoji: '🦊',
+                furDefault: '#e07a5f',
+                bellyDefault: '#fefae0',
+                accentColor: '#f4a261',
+                desc: 'Astuto, independiente y muy veloz detectando plástico.'
+            },
+            bichon: {
+                id: 'bichon',
+                name: 'Bichón',
+                breedTitle: 'Bichón Frisé Reciclador',
+                emoji: '🐩',
+                furDefault: '#f8fafc',
+                bellyDefault: '#f1f5f9',
+                accentColor: '#fbcfe8',
+                desc: 'Esponjoso como una nube limpia y amante del papel reciclado.'
+            },
+            salchicha: {
+                id: 'salchicha',
+                name: 'Salchita',
+                breedTitle: 'Perro Salchicha Reciclador',
+                emoji: '🌭',
+                furDefault: '#8d5b4c',
+                bellyDefault: '#d4a373',
+                accentColor: '#633a2e',
+                desc: 'Largo y curioso, rastrea latas hasta debajo de los muebles.'
+            },
+            pug: {
+                id: 'pug',
+                name: 'Puggy',
+                breedTitle: 'Pug Reciclador',
+                emoji: '🐶',
+                furDefault: '#d4a373',
+                bellyDefault: '#fefae0',
+                accentColor: '#3a2a22',
+                desc: 'Simpático, carismático y guardián de los frascos de vidrio.'
+            }
+        };
+
+        // Color Palettes
+        const furColorPalettes = {
+            default: { name: 'Original', main: null, belly: null },
+            golden: { name: 'Dorado / Canela', main: '#f59e0b', belly: '#fef3c7' },
+            black: { name: 'Noche / Azabache', main: '#334155', belly: '#64748b' },
+            chocolate: { name: 'Chocolate', main: '#78350f', belly: '#fef3c7' },
+            pink: { name: 'Mágico Rosado', main: '#f472b6', belly: '#fce7f3' }
+        };
+
+        // Wardrobe Store Items
+        const wardrobeStore = [
+            { id: 'default', name: 'Chaleco de Reciclador', cost: 0, icon: '🦺', desc: 'El chalequito fluorescente oficial con bandas reflectantes y medalla.' },
+            { id: 'glasses', name: 'Lentes Eco-Cool', cost: 25, icon: '🕶️', desc: 'Lentes de sol con marco metálico y reflejo brillante estilo agente secreto.' },
+            { id: 'helmet', name: 'Casco de Ingeniero Eco', cost: 50, icon: '👷‍♂️', desc: 'Casco de protección amarillo con linterna frontal y emblema verde.' },
+            { id: 'cape', name: 'Capa de SuperHéroe Eco', cost: 80, icon: '🦸‍♂️', desc: 'Capa verde ondeante con estrella dorada para salvar la naturaleza.' },
+            { id: 'gold_collar', name: 'Collar de Oro Eco', cost: 120, icon: '🏅', desc: 'Gargantilla dorada brillante con estrella de honor al mérito ecológico.' },
+            { id: 'chef', name: 'Sombrero Chef Composta', cost: 150, icon: '👨‍🍳', desc: 'Gorro blanco de maestro chef experto en transformar residuos orgánicos.' }
+        ];
+
+        // Questions Database
+        const questionsDB = [
+            {
+                id: 1,
+                axis: "Contenedor Amarillo",
+                badgeIcon: "🟡",
+                category: "Plásticos y Envases",
+                speech: "¡Hola! Encontré una botella de plástico vacía de jugo. ¿En qué contenedor debo depositarla para que se convierta en algo nuevo?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Contenedor Amarillo (Plásticos y Latas)", correct: true },
+                    { text: "Contenedor Verde (Vidrio)", correct: false },
+                    { text: "Contenedor Azul (Papel)", correct: false },
+                    { text: "Tirarla al suelo de la plaza", correct: false }
+                ],
+                explanation: "Las botellas de plástico, latas de soda y envases de jugos siempre van al contenedor amarillo.",
+                pibbleLearned: "El plástico y los metales ligeros van al contenedor amarillo para convertirse en telas o nuevos envases."
+            },
+            {
+                id: 2,
+                axis: "Contenedor Verde",
+                badgeIcon: "🟢",
+                category: "Vidrio Transparente",
+                speech: "¡Woof! Hay un frasco de mermelada de vidrio totalmente limpio. ¿Dónde lo guardamos para reciclarlo?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Contenedor Azul", correct: false },
+                    { text: "Contenedor Verde (Vidrio)", correct: true },
+                    { text: "Contenedor Orgánico Marrón", correct: false },
+                    { text: "En la papelera de basura general", correct: false }
+                ],
+                explanation: "El vidrio se puede reciclar infinitas veces sin perder su calidad cuando se deposita en el verde.",
+                pibbleLearned: "El vidrio es 100% reciclable infinitas veces si lo tiramos al contenedor verde."
+            },
+            {
+                id: 3,
+                axis: "Desafío del Gato",
+                badgeIcon: "⚡",
+                category: "Papel y Cartón",
+                speech: "¡Misifú está diciendo cosas raras sobre esta caja de cartón de cereales! ¿Qué hacemos?",
+                isCatChallenge: true,
+                catMyth: "¡Miau! Las cajas de cartón son para rascar y luego tirarlas al río, ¡nunca se reciclan!",
+                options: [
+                    { text: "Aplanar la caja y ponerla en el Contenedor Azul", correct: true },
+                    { text: "Hacerle caso al gato y tirarla al río", correct: false },
+                    { text: "Meterla en el contenedor amarillo", correct: false },
+                    { text: "Quemarla en el patio", correct: false }
+                ],
+                explanation: "¡Ignora al gato! El cartón seco se aplanar e introduce en el contenedor azul para hacer más cuadernos.",
+                pibbleLearned: "Aplanar el cartón ahorra espacio en el contenedor azul y evita la tala innecesaria de árboles."
+            },
+            {
+                id: 4,
+                axis: "Orgánico",
+                badgeIcon: "🟤",
+                category: "Residuos de Comida",
+                speech: "A mi humano le quedó la cáscara de un plátano y restos de manzana. ¿A dónde van los residuos orgánicos?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Contenedor Azul", correct: false },
+                    { text: "Contenedor Marrón / Orgánico (Composta)", correct: true },
+                    { text: "Contenedor Verde", correct: false },
+                    { text: "Lanzarlo a la calle para los pájaros", correct: false }
+                ],
+                explanation: "Las cáscaras de frutas y vegetales van al orgánico para convertirse en abono fertilizante (composta).",
+                pibbleLearned: "Los restos orgánicos se transforman en composta natural para nutrir las plantas de los jardines."
+            },
+            {
+                id: 5,
+                axis: "Punto Limpio",
+                badgeIcon: "🔋",
+                category: "Pilas y Baterías",
+                speech: "Encontré un juguete viejo con pilas gastadas. ¿Se pueden tirar al contenedor normal de basura?",
+                isCatChallenge: false,
+                options: [
+                    { text: "¡Jamás! Van al Punto Limpio o contenedor especial de pilas", correct: true },
+                    { text: "Sí, van al contenedor amarillo", correct: false },
+                    { text: "Van al contenedor de cartón", correct: false },
+                    { text: "Se entierran en el jardín", correct: false }
+                ],
+                explanation: "Las pilas contienen químicos nocivos. Se deben llevar a recopiladores de pilas o al Punto Limpio.",
+                pibbleLearned: "Las pilas tienen sustancias peligrosas y nunca van a la basura normal, sino al Punto Limpio."
+            },
+            {
+                id: 6,
+                axis: "Desafío del Gato",
+                badgeIcon: "⚡",
+                category: "Aceite de Cocina",
+                speech: "¡Misifú está junto a la sartén con aceite usado! ¿Qué intenta sugerir?",
+                isCatChallenge: true,
+                catMyth: "¡Miau! El aceite viejo se tira por el lavadero de platos, se limpia superfácil con agua.",
+                options: [
+                    { text: "Guardarlo en una botella y llevarlo al Punto Limpio", correct: true },
+                    { text: "Hacerle caso al gato y derramarlo en el fregadero", correct: false },
+                    { text: "Echarlo en el jardín de las flores", correct: false },
+                    { text: "Tirarlo a la alcantarilla", correct: false }
+                ],
+                explanation: "¡Un solo litro de aceite contamina hasta 1,000 litros de agua! Se guarda en botella y va al Punto Limpio.",
+                pibbleLearned: "El aceite usado arruina el agua dulce si se tira al desagüe. ¡Se recicla en botellas cerradas!"
+            },
+            {
+                id: 7,
+                axis: "Ahorro de Agua",
+                badgeIcon: "💧",
+                category: "Cuidado del Agua",
+                speech: "Mientras lavo mis patitas, el caño de agua queda abierto corriendo sin parar. ¿Qué debemos hacer?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Cerrar el caño mientras nos enjabonamos", correct: true },
+                    { text: "Dejarlo abierto para escuchar el sonido", correct: false },
+                    { text: "Abrir más caños en la casa", correct: false },
+                    { text: "Lavar con agua caliente hirviendo", correct: false }
+                ],
+                explanation: "Cerrar la llave mientras te cepillas o enjabonas ahorra hasta 12 litros de agua por minuto.",
+                pibbleLearned: "Cerrar el caño mientras te enjabonas o cepillas los dientes salva miles de litros de agua dulce."
+            },
+            {
+                id: 8,
+                axis: "Contenedor Azul",
+                badgeIcon: "🔵",
+                category: "Hojas de Papel",
+                speech: "Tengo unos bocetos de dibujos viejos por ambos lados. ¿Cómo debemos reciclarlos?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Llevarlos al Contenedor Azul sin grapas", correct: true },
+                    { text: "Quemarlos en una lata", correct: false },
+                    { text: "Tirarlos al contenedor verde", correct: false },
+                    { text: "Envolverlos en plástico y a la calle", correct: false }
+                ],
+                explanation: "El papel usado y limpio entra al contenedor azul para convertirse en papel reciclado.",
+                pibbleLearned: "Usar las dos caras del papel y reciclarlo en el azul evita destruir más bosques."
+            },
+            {
+                id: 9,
+                axis: "Desafío del Gato",
+                badgeIcon: "⚡",
+                category: "Electrónicos",
+                speech: "¡El gato Misifú está pateando un celular viejo roto en el patio!",
+                isCatChallenge: true,
+                catMyth: "¡Miau! Los cables y aparatos rotos se tiran a la bolsa de la basura común sin que nadie se dé cuenta.",
+                options: [
+                    { text: "Llevarlo al Punto Limpio o RAEE de aparatos electrónicos", correct: true },
+                    { text: "Tirarlo a la basura normal como dice el gato", correct: false },
+                    { text: "Meterlo al contenedor de basura orgánica", correct: false },
+                    { text: "Echarlo al contenedor de cristal", correct: false }
+                ],
+                explanation: "Los electrónicos (RAEE) tienen metales valiosos y componentes que deben procesarse en Puntos Limpios.",
+                pibbleLearned: "Los aparatos tecnológicos rotos contienen metales valiosos que se recuperan en centros especializados."
+            },
+            {
+                id: 10,
+                axis: "Bolsas Reutilizables",
+                badgeIcon: "🛍️",
+                category: "Reducción de Plásticos",
+                speech: "Vamos de compras al supermercado a traer premios para perritos. ¿Qué bolsa debemos llevar?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Bolsas de tela o canastas reutilizables", correct: true },
+                    { text: "Pedir 10 bolsas plásticas desechables nuevas", correct: false },
+                    { text: "No llevar nada y tirar todo al suelo", correct: false },
+                    { text: "Usar bolsas de aluminio", correct: false }
+                ],
+                explanation: "Las bolsas de tela se usan cientos de veces, reduciendo el plástico de un solo uso en los océanos.",
+                pibbleLearned: "Llevar tu propia bolsa de tela evita que miles de bolsas plásticas lleguen al mar."
+            },
+            {
+                id: 11,
+                axis: "Cuidado Marino",
+                badgeIcon: "🌊",
+                category: "Océanos Limpios",
+                speech: "Fuimos a la playa a jugar con la pelota y vimos plásticos flotando en la orilla. ¿Por qué es tan peligroso?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Porque los peces y tortugas los confunden con alimento", correct: true },
+                    { text: "Porque el agua cambia de color y se ve fea", correct: false },
+                    { text: "Porque el plástico flota muy rápido", correct: false },
+                    { text: "No es peligroso, a los peces les gusta", correct: false }
+                ],
+                explanation: "Las tortugas confunden las bolsas de plástico con medusas, lo que pone en riesgo su vida.",
+                pibbleLearned: "El plástico en el mar pone en peligro a tortugas, peces y aves marinas."
+            },
+            {
+                id: 12,
+                axis: "Desafío del Gato",
+                badgeIcon: "⚡",
+                category: "Ropa y Textiles",
+                speech: "¡Misifú está enredado en una camiseta vieja y quiere romperla en pedazos!",
+                isCatChallenge: true,
+                catMyth: "¡Miau! La ropa usada que ya no te queda se bota directo a la basura o se quema.",
+                options: [
+                    { text: "Donarla, convertirla en trapos de limpieza o llevarla a contenedores de ropa", correct: true },
+                    { text: "Botarla a la basura como dice el gato", correct: false },
+                    { text: "Tirarla por la ventana", correct: false },
+                    { text: "Enterrarla en la maceta", correct: false }
+                ],
+                explanation: "La ropa limpia se puede donar a otras personas o transformar en trapos para no desperdiciar tela.",
+                pibbleLearned: "Reutilizar o donar ropa reduce el desperdicio textil y ayuda a otras familias."
+            },
+            {
+                id: 13,
+                axis: "Compostaje",
+                badgeIcon: "🌱",
+                category: "Jardinería Ecológica",
+                speech: "Juntamos hojas secas del jardín y cascarones de huevo. ¿Qué súper producto podemos fabricar?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Composta (Abono rico para las plantas)", correct: true },
+                    { text: "Plástico sintético", correct: false },
+                    { text: "Papel periódico", correct: false },
+                    { text: "Jabón de baño", correct: false }
+                ],
+                explanation: "El compostaje convierte los restos orgánicos en tierra nutrida para sembrar árboles y flores.",
+                pibbleLearned: "El compostaje convierte la basura orgánica en alimento rico para plantas y flores."
+            },
+            {
+                id: 14,
+                axis: "Energía Limpia",
+                badgeIcon: "💡",
+                category: "Ahorro de Luz",
+                speech: "Salimos a pasear al parque de día y dejamos las luces del cuarto prendidas. ¿Qué es lo correcto?",
+                isCatChallenge: false,
+                options: [
+                    { text: "Apagar todas las luces al salir de una habitación", correct: true },
+                    { text: "Dejar focos y televisión prendidos todo el día", correct: false },
+                    { text: "Prender más focos para que la casa no esté sola", correct: false },
+                    { text: "Comprar más focos viejos", correct: false }
+                ],
+                explanation: "Apagar la luz ahorra electricidad, reduce la quema de combustibles fósiles y cuida el clima.",
+                pibbleLearned: "Apagar los focos cuando no los usas ahorra energía y protege nuestro clima global."
+            },
+            {
+                id: 15,
+                axis: "Desafío Final del Gato",
+                badgeIcon: "🎓",
+                category: "Eco-Master Supremo",
+                speech: "¡El Gato Misifú reconoce que aprendiste mucho, pero te pone su prueba final!",
+                isCatChallenge: true,
+                catMyth: "¡Miau! De nada sirve que una sola persona o un solo perrito recicle si los demás no lo hacen.",
+                options: [
+                    { text: "¡Cada pequeño esfuerzo suma e inspira a toda la comunidad!", correct: true },
+                    { text: "Darme por vencido y dejar de reciclar", correct: false },
+                    { text: "Tirar la basura al canal de agua", correct: false },
+                    { text: "Esconder los tachos de reciclaje", correct: false }
+                ],
+                explanation: "¡Lo lograste! Tus acciones inspiran a tus amigos, vecinos y familia a cuidar el planeta juntos.",
+                pibbleLearned: "¡Tus acciones ecológicas inspiran a todos a crear un mundo más limpio y sano!"
+            }
+        ];
+
+        // Sound Engine
+        function playSound(type) {
+            if (!gameState.audioEnabled) return;
+
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                if (type === 'bark') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'meow') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(650, ctx.currentTime + 0.2);
+                    osc.frequency.linearRampToValueAtTime(350, ctx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                } else if (type === 'correct') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + idx * 0.08);
+                        osc.stop(ctx.currentTime + idx * 0.08 + 0.25);
+                    });
+                } else if (type === 'wrong') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else if (type === 'alert') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    osc.frequency.setValueAtTime(400, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch (e) {
+                console.log("Audio not allowed yet or error:", e);
+            }
+        }
+
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            const icon = document.getElementById('icon-sound');
+            if (gameState.audioEnabled) {
+                icon.className = "fa-solid fa-volume-high text-amber-400";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-slate-500";
+            }
+        }
+
+        // Helper getters
+        function getDogName() {
+            return breedsDB[gameState.currentBreed].name;
+        }
+
+        function getDogBreedTitle() {
+            return breedsDB[gameState.currentBreed].breedTitle;
+        }
+
+        function setTheme(themeClass) {
+            gameState.currentTheme = themeClass;
+            document.body.className = `${themeClass} min-h-screen flex flex-col justify-between overflow-x-hidden`;
+        }
+
+        // Navigation Tabs Handler
+        function switchTab(tabId) {
+            ['quiz', 'notebook', 'wardrobe', 'ai-ask'].forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabId) {
+                    view.classList.remove('hidden');
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2 bg-amber-500 text-slate-950 font-fun shadow";
+                } else {
+                    view.classList.add('hidden');
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition flex items-center gap-2 text-slate-300 hover:bg-slate-800";
+                }
+            });
+
+            if (tabId === 'notebook') renderNotebook();
+            if (tabId === 'wardrobe') renderWardrobe();
+        }
+
+        // SVG Dog Renderer
+        function renderDogSVG() {
+            const container = document.getElementById('dog-svg-wrapper');
+            if (!container) return;
+
+            const breedKey = gameState.currentBreed;
+            const breed = breedsDB[breedKey];
+            const palette = furColorPalettes[gameState.currentFurColor];
+
+            const mainFur = palette.main || breed.furDefault;
+            const bellyFur = palette.belly || breed.bellyDefault;
+            const accent = breed.accentColor;
+
+            const isHappy = gameState.currentMood === 'happy' || gameState.currentMood === 'proud';
+            const isSad = gameState.currentMood === 'sad';
+            const isConfused = gameState.currentMood === 'confused_cat';
+
+            let breedHeadSVG = '';
+            let breedBodySVG = '';
+
+            if (breedKey === 'pitbull') {
+                breedBodySVG = `
+                    <ellipse cx="100" cy="150" rx="44" ry="40" fill="${mainFur}" stroke="#e2e8f0" stroke-width="1.5" />
+                    <ellipse cx="100" cy="153" rx="32" ry="28" fill="${bellyFur}" />
+                    <path class="animate-wag" d="M 148 138 Q 180 120 172 100 Q 155 118 142 132 Z" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <ellipse cx="74" cy="184" rx="14" ry="10" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <ellipse cx="126" cy="184" rx="14" ry="10" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                `;
+                breedHeadSVG = `
+                    <g class="animate-ear-left">
+                        <path d="M 54 58 C 28 12, 64 8, 74 46 Z" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                        <path d="M 56 53 C 36 20, 60 16, 68 45 Z" fill="${accent}" />
+                    </g>
+                    <g>
+                        <path d="M 146 58 C 172 12, 136 8, 126 46 Z" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                        <path d="M 144 53 C 164 20, 140 16, 132 45 Z" fill="${accent}" />
+                    </g>
+                    <path d="M 50 75 C 50 36, 150 36, 150 75 C 154 112, 140 130, 100 132 C 60 130, 46 112, 50 75 Z" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <ellipse cx="100" cy="94" rx="30" ry="21" fill="${bellyFur}" />
+                `;
+            } else if (breedKey === 'shiba') {
+                breedBodySVG = `
+                    <ellipse cx="100" cy="150" rx="42" ry="38" fill="${mainFur}" stroke="#c2410c" stroke-width="1.5" />
+                    <ellipse cx="100" cy="152" rx="28" ry="26" fill="${bellyFur}" />
+                    <path class="animate-wag" d="M 140 135 C 185 110, 170 70, 145 90 C 130 102, 145 125, 138 135 Z" fill="${mainFur}" stroke="#c2410c" stroke-width="2" />
+                    <ellipse cx="74" cy="184" rx="13" ry="10" fill="${mainFur}" stroke="#c2410c" stroke-width="1.5" />
+                    <ellipse cx="126" cy="184" rx="13" ry="10" fill="${mainFur}" stroke="#c2410c" stroke-width="1.5" />
+                `;
+                breedHeadSVG = `
+                    <polygon points="46,62 32,18 78,44" fill="${mainFur}" stroke="#c2410c" stroke-width="2" />
+                    <polygon points="52,58 40,28 72,45" fill="${bellyFur}" />
+                    <polygon points="154,62 168,18 122,44" fill="${mainFur}" stroke="#c2410c" stroke-width="2" />
+                    <polygon points="148,58 160,28 128,45" fill="${bellyFur}" />
+                    <path d="M 52 75 C 52 38, 148 38, 148 75 C 152 110, 138 128, 100 130 C 62 128, 48 110, 52 75 Z" fill="${mainFur}" stroke="#c2410c" stroke-width="1.5" />
+                    <path d="M 68 85 Q 100 68 132 85 Q 140 115 100 126 Q 60 115 68 85 Z" fill="${bellyFur}" />
+                `;
+            } else if (breedKey === 'bichon') {
+                breedBodySVG = `
+                    <circle cx="100" cy="150" r="42" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <circle cx="75" cy="135" r="22" fill="${mainFur}" />
+                    <circle cx="125" cy="135" r="22" fill="${mainFur}" />
+                    <path class="animate-wag" d="M 142 140 Q 175 125 168 105 Q 150 120 138 135 Z" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <ellipse cx="74" cy="184" rx="14" ry="10" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <ellipse cx="126" cy="184" rx="14" ry="10" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                `;
+                breedHeadSVG = `
+                    <circle cx="48" cy="72" r="28" fill="${mainFur}" stroke="#cbd5e1" stroke-width="1.5" />
+                    <circle cx="152" cy="72" r="28" fill="${mainFur}" stroke="#cbd5e1" stroke-width="1.5" />
+                    <circle cx="100" cy="70" r="46" fill="${mainFur}" stroke="#cbd5e1" stroke-width="2" />
+                    <ellipse cx="100" cy="94" rx="26" ry="18" fill="#ffffff" />
+                `;
+            } else if (breedKey === 'salchicha') {
+                breedBodySVG = `
+                    <ellipse cx="100" cy="154" rx="52" ry="32" fill="${mainFur}" stroke="#451a03" stroke-width="2" />
+                    <ellipse cx="100" cy="156" rx="36" ry="20" fill="${bellyFur}" />
+                    <path class="animate-wag" d="M 152 148 Q 185 130 180 115 Q 160 130 148 144 Z" fill="${mainFur}" stroke="#451a03" stroke-width="2" />
+                    <ellipse cx="65" cy="184" rx="11" ry="10" fill="${mainFur}" stroke="#451a03" stroke-width="2" />
+                    <ellipse cx="135" cy="184" rx="11" ry="10" fill="${mainFur}" stroke="#451a03" stroke-width="2" />
+                `;
+                breedHeadSVG = `
+                    <path d="M 54 62 C 24 60, 26 115, 56 100 Z" fill="${accent}" stroke="#451a03" stroke-width="2" />
+                    <path d="M 146 62 C 176 60, 174 115, 144 100 Z" fill="${accent}" stroke="#451a03" stroke-width="2" />
+                    <path d="M 60 72 C 60 40, 140 40, 140 72 C 144 110, 135 128, 100 130 C 65 128, 56 110, 60 72 Z" fill="${mainFur}" stroke="#451a03" stroke-width="2" />
+                    <ellipse cx="100" cy="98" rx="24" ry="20" fill="${bellyFur}" />
+                `;
+            } else if (breedKey === 'pug') {
+                breedBodySVG = `
+                    <ellipse cx="100" cy="150" rx="46" ry="38" fill="${mainFur}" stroke="#78350f" stroke-width="2" />
+                    <ellipse cx="100" cy="152" rx="30" ry="24" fill="${bellyFur}" />
+                    <path class="animate-wag" d="M 144 138 Q 170 115 162 102 Q 148 115 138 132 Z" fill="${mainFur}" stroke="#78350f" stroke-width="2" />
+                    <ellipse cx="72" cy="184" rx="14" ry="10" fill="${mainFur}" stroke="#78350f" stroke-width="2" />
+                    <ellipse cx="128" cy="184" rx="14" ry="10" fill="${mainFur}" stroke="#78350f" stroke-width="2" />
+                `;
+                breedHeadSVG = `
+                    <polygon points="56,58 32,45 68,36" fill="${accent}" stroke="#1c1917" stroke-width="2" />
+                    <polygon points="144,58 168,45 132,36" fill="${accent}" stroke="#1c1917" stroke-width="2" />
+                    <circle cx="100" cy="78" r="42" fill="${mainFur}" stroke="#78350f" stroke-width="2" />
+                    <ellipse cx="100" cy="92" rx="28" ry="22" fill="${accent}" />
+                    <path d="M 85 62 Q 100 58 115 62" stroke="#1c1917" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                    <path d="M 88 68 Q 100 65 112 68" stroke="#1c1917" stroke-width="2" fill="none" stroke-linecap="round" />
+                `;
+            }
+
+            let eyesSVG = '';
+            if (isHappy) {
+                eyesSVG = `
+                    <path d="M 64 76 Q 74 62 84 76" stroke="#18181b" stroke-width="4" stroke-linecap="round" fill="none" />
+                    <path d="M 116 76 Q 126 62 136 76" stroke="#18181b" stroke-width="4" stroke-linecap="round" fill="none" />
+                `;
+            } else if (isSad) {
+                eyesSVG = `
+                    <path d="M 66 70 L 80 80 M 80 70 L 66 80" stroke="#18181b" stroke-width="3.5" stroke-linecap="round" />
+                    <path d="M 120 70 L 134 80 M 134 70 L 120 80" stroke="#18181b" stroke-width="3.5" stroke-linecap="round" />
+                `;
+            } else if (isConfused) {
+                eyesSVG = `
+                    <circle cx="74" cy="74" r="11" fill="#18181b" />
+                    <circle cx="71" cy="71" r="4" fill="#ffffff" />
+                    <circle cx="126" cy="74" r="11" fill="#18181b" />
+                    <circle cx="123" cy="71" r="4" fill="#ffffff" />
+                    <text x="94" y="62" font-size="20" font-weight="bold" fill="#ea580c">!</text>
+                `;
+            } else {
+                eyesSVG = `
+                    <circle cx="74" cy="74" r="10" fill="#18181b" />
+                    <circle cx="71" cy="71" r="4" fill="#ffffff" />
+                    <circle cx="77" cy="77" r="1.5" fill="#ffffff" />
+                    <circle cx="126" cy="74" r="10" fill="#18181b" />
+                    <circle cx="123" cy="71" r="4" fill="#ffffff" />
+                    <circle cx="129" cy="77" r="1.5" fill="#ffffff" />
+                `;
+            }
+
+            const equipId = gameState.currentEquip;
+            let accessorySVG = '';
+
+            if (equipId === 'default') {
+                accessorySVG = `
+                    <path d="M 60 130 Q 100 118 140 130 L 144 172 Q 100 182 56 172 Z" fill="#84cc16" opacity="0.95" />
+                    <rect x="66" y="140" width="68" height="6" rx="2" fill="#f1f5f9" />
+                    <rect x="63" y="156" width="74" height="6" rx="2" fill="#f1f5f9" />
+                    <circle cx="100" cy="148" r="10" fill="#15803d" stroke="#bbf7d0" stroke-width="1.5" />
+                    <text x="100" y="152" font-size="10" text-anchor="middle" fill="#ffffff" font-weight="bold">♻️</text>
+                `;
+            } else if (equipId === 'glasses') {
+                accessorySVG = `
+                    <path d="M 58 68 L 96 68 L 94 86 L 60 86 Z M 104 68 L 142 68 L 140 86 L 106 86 Z" fill="#020617" stroke="#38bdf8" stroke-width="1.5" />
+                    <line x1="96" y1="74" x2="104" y2="74" stroke="#020617" stroke-width="3" />
+                    <line x1="64" y1="72" x2="78" y2="82" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+                    <line x1="110" y1="72" x2="124" y2="82" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+                `;
+            } else if (equipId === 'helmet') {
+                accessorySVG = `
+                    <path d="M 46 54 Q 100 16 154 54 L 164 62 L 36 62 Z" fill="#facc15" stroke="#ca8a04" stroke-width="2" />
+                    <rect x="34" y="58" width="132" height="6" rx="3" fill="#eab308" />
+                    <circle cx="100" cy="38" r="8" fill="#16a34a" stroke="#bbf7d0" stroke-width="1.5" />
+                    <text x="100" y="42" font-size="9" text-anchor="middle" fill="#ffffff">🌿</text>
+                `;
+            } else if (equipId === 'cape') {
+                accessorySVG = `
+                    <path d="M 52 140 Q 100 128 148 140 L 178 198 L 22 198 Z" fill="#16a34a" stroke="#15803d" stroke-width="2" />
+                    <circle cx="100" cy="165" r="14" fill="#facc15" />
+                    <text x="100" y="170" font-size="14" text-anchor="middle">⭐</text>
+                `;
+            } else if (equipId === 'gold_collar') {
+                accessorySVG = `
+                    <path d="M 64 136 Q 100 152 136 136" stroke="#f59e0b" stroke-width="10" fill="none" stroke-linecap="round" />
+                    <path d="M 64 136 Q 100 152 136 136" stroke="#fef08a" stroke-width="3" fill="none" stroke-linecap="round" />
+                    <circle cx="100" cy="148" r="12" fill="#fbbf24" stroke="#d97706" stroke-width="2" />
+                    <text x="100" y="152.5" font-size="11" text-anchor="middle">🏅</text>
+                `;
+            } else if (equipId === 'chef') {
+                accessorySVG = `
+                    <path d="M 68 46 C 50 20, 80 5, 100 8 C 120 5, 150 20, 132 46 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" />
+                    <rect x="64" y="44" width="72" height="14" rx="3" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+                    <text x="100" y="55" font-size="10" text-anchor="middle">🌱</text>
+                `;
+            }
+
+            container.innerHTML = `
+                <svg viewBox="0 0 200 210" class="w-full h-full drop-shadow-2xl overflow-visible">
+                    <circle cx="100" cy="105" r="92" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+                    <circle cx="100" cy="105" r="86" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="6,6"/>
+
+                    ${breedBodySVG}
+                    ${breedHeadSVG}
+
+                    <circle cx="62" cy="88" r="7" fill="#fbcfe8" opacity="0.6" />
+                    <circle cx="138" cy="88" r="7" fill="#fbcfe8" opacity="0.6" />
+
+                    <path d="M 92 84 C 92 78, 108 78, 108 84 C 108 92, 92 92, 92 84 Z" fill="#27272a" />
+                    <ellipse cx="96" cy="82" rx="2.5" ry="1.5" fill="#a1a1aa" />
+
+                    ${eyesSVG}
+
+                    ${isSad ? `
+                        <path d="M 88 104 Q 100 95 112 104" stroke="#27272a" stroke-width="3" fill="none" stroke-linecap="round" />
+                    ` : `
+                        <path d="M 86 96 Q 100 104 114 96" stroke="#27272a" stroke-width="3" fill="none" stroke-linecap="round" />
+                        <path d="M 92 100 Q 100 114 108 100 Z" fill="#fb7185" />
+                    `}
+
+                    ${accessorySVG}
+                </svg>
+            `;
+        }
+
+        // Mood Handler
+        function setPibbleMood(mood) {
+            gameState.currentMood = mood;
+            const dogName = getDogName();
+
+            if (mood === 'welcome') {
+                document.getElementById('speaker-name-label').innerText = `¡Bienvenidos con ${dogName}!`;
+            } else if (mood === 'confused_cat') {
+                document.getElementById('speaker-name-label').innerText = `¡ALERTA DE INTRUSO!`;
+            } else if (mood === 'confused') {
+                document.getElementById('speaker-name-label').innerText = `${dogName} te pregunta:`;
+            } else if (mood === 'happy') {
+                document.getElementById('speaker-name-label').innerText = `¡${dogName} está muy feliz!`;
+            } else if (mood === 'sad') {
+                document.getElementById('speaker-name-label').innerText = `${dogName} tiene una duda...`;
+            } else if (mood === 'proud') {
+                document.getElementById('speaker-name-label').innerText = `¡${dogName} ES UN MAESTRO ECO!`;
+            }
+
+            renderDogSVG();
+        }
+
+        // Pet Interactivity
+        function barkPibbleInteractive(e) {
+            playSound('bark');
+            const hearts = document.getElementById('hearts-container');
+            if (hearts) {
+                const heart = document.createElement('span');
+                heart.className = 'floating-heart text-2xl';
+                heart.innerText = '💖';
+                heart.style.left = `${Math.random() * 60 + 20}%`;
+                heart.style.top = '40%';
+                hearts.appendChild(heart);
+                setTimeout(() => heart.remove(), 1200);
+            }
+        }
+
+        function meowCatInteractive(e) {
+            playSound('meow');
+            const cat = document.getElementById('cat-avatar-container');
+            if (cat) {
+                cat.classList.add('animate-shake');
+                setTimeout(() => cat.classList.remove('animate-shake'), 500);
+            }
+        }
+
+        // 15 Sec Cat Challenge Timer
+        function start15SecTimer() {
+            stopTimer();
+            gameState.timerSeconds = 15;
+
+            const timerBanner = document.getElementById('cat-timer-banner');
+            const timerBarContainer = document.getElementById('timer-bar-container');
+            const timerSecs = document.getElementById('timer-seconds');
+            const timerBar = document.getElementById('timer-bar');
+
+            timerBanner.classList.remove('hidden');
+            timerBarContainer.classList.remove('hidden');
+            timerSecs.innerText = '15';
+            timerBar.style.width = '100%';
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timerSeconds--;
+                timerSecs.innerText = gameState.timerSeconds;
+                const pct = (gameState.timerSeconds / 15) * 100;
+                timerBar.style.width = `${pct}%`;
+
+                if (gameState.timerSeconds <= 0) {
+                    stopTimer();
+                    const q = questionsDB[gameState.currentQuestionIdx];
+                    const firstWrong = document.querySelector('.option-btn');
+                    if (firstWrong) {
+                        selectOption(firstWrong, false, q);
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+        }
+
+        // Start Game
+        function startGame() {
+            gameState.hasStarted = true;
+            gameState.currentQuestionIdx = 0;
+            renderCurrentQuestion();
+        }
+
+        function renderWelcomeScreen() {
+            const dogName = getDogName();
+            const breedInfo = breedsDB[gameState.currentBreed];
+
+            document.getElementById('question-category').innerText = "¡Bienvenidos!";
+            document.getElementById('pibble-speech').innerText = `"¡Hola amigo humano! Soy ${dogName} ${breedInfo.emoji}. Tengo listo mi chalequito de reciclador porque quiero aprender a cuidar nuestro planeta. ¡Acompáñame en mis lecciones para convertirme en un perro reciclador profesional! 🌿"`;
+            document.getElementById('options-title').innerHTML = `<i class="fa-solid fa-star text-amber-400"></i> ¡Comienza la aventura escolar de ${dogName}!`;
+
+            setPibbleMood('welcome');
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col items-center text-center p-6 bg-gradient-to-b from-slate-950 to-slate-900 rounded-3xl border border-amber-500/30 shadow-2xl">
+                    <div class="flex gap-2 text-3xl mb-3">
+                        <span>♻️</span><span>🥤</span><span>📦</span><span>🫙</span><span>🌱</span>
+                    </div>
+                    <p class="text-sm md:text-base text-slate-300 mb-6 max-w-lg leading-relaxed">
+                        Acompaña a <strong>${dogName} (${breedInfo.breedTitle})</strong> a través de <strong>15 lecciones esenciales</strong> sobre reciclaje. ¡Responde correctamente para ganar Huesitos Eco y vestirlo con geniales trajes! 🦴✨
+                    </p>
+                    <button onclick="startGame()" class="px-8 py-4 bg-gradient-to-r from-amber-400 via-lime-400 to-emerald-400 text-slate-950 font-extrabold text-lg md:text-xl font-fun rounded-2xl transition shadow-xl hover:scale-105 active:scale-95 flex items-center gap-3 animate-bounce">
+                        <span>🐾</span> Empieza a aprender a reciclar <span>✨</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderCurrentQuestion() {
+            stopTimer();
+
+            if (!gameState.hasStarted) {
+                renderWelcomeScreen();
+                return;
+            }
+
+            const q = questionsDB[gameState.currentQuestionIdx];
+            const dogName = getDogName();
+
+            const knowledgePercent = Math.round((gameState.unlockedFacts.length / questionsDB.length) * 100);
+            document.getElementById('stat-knowledge').innerText = `${knowledgePercent} %`;
+            document.getElementById('stat-bones').innerText = gameState.ecoBones;
+            document.getElementById('stat-progress').innerText = `${gameState.currentQuestionIdx + 1}/${questionsDB.length}`;
+
+            const catAvatar = document.getElementById('cat-avatar-container');
+            const catMythBox = document.getElementById('cat-myth-box');
+            const timerBanner = document.getElementById('cat-timer-banner');
+            const timerBarContainer = document.getElementById('timer-bar-container');
+            const stageCard = document.getElementById('pibble-stage-card');
+            const speakerTitle = document.getElementById('speaker-title');
+
+            if (q.isCatChallenge) {
+                gameState.catActive = true;
+                playSound('alert');
+                playSound('meow');
+
+                stageCard.classList.add('animate-shake');
+                setTimeout(() => stageCard.classList.remove('animate-shake'), 600);
+
+                catAvatar.classList.remove('hidden');
+                catMythBox.classList.remove('hidden');
+                document.getElementById('cat-myth-text').innerText = `"${q.catMyth}"`;
+
+                stageCard.className = "bg-slate-900 border-2 border-rose-500/80 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 cat-alert-glow";
+                speakerTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> <span class="text-rose-400">¡¡AYUDA A ${dogName.toUpperCase()} EN 15 SEGUNDOS!!</span>`;
+
+                setPibbleMood('confused_cat');
+                start15SecTimer();
+            } else {
+                gameState.catActive = false;
+                catAvatar.classList.add('hidden');
+                catMythBox.classList.add('hidden');
+                timerBanner.classList.add('hidden');
+                timerBarContainer.classList.add('hidden');
+
+                stageCard.className = "bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 transition-all duration-300";
+                speakerTitle.innerHTML = `<i class="fa-solid fa-comment-dots text-amber-400"></i> <span>${dogName} te pregunta:</span>`;
+
+                setPibbleMood('confused');
+            }
+
+            document.getElementById('question-category').innerText = q.axis;
+            const replacedSpeech = q.speech.replace(/Pibble/g, dogName);
+            document.getElementById('pibble-speech').innerText = `"${replacedSpeech}"`;
+
+            document.getElementById('options-title').innerHTML = q.isCatChallenge ? 
+                `<i class="fa-solid fa-bolt text-rose-400"></i> ¡RÁPIDO! Selecciona la respuesta correcta antes de que venza el tiempo:` :
+                `<i class="fa-solid fa-hand-pointer text-amber-400"></i> Selecciona la respuesta correcta para enseñar a ${dogName}:`;
+
+            const learnBox = document.getElementById('pibble-learning-box');
+            learnBox.classList.add('hidden');
+            document.getElementById('btn-next-question').classList.add('hidden');
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-4 rounded-2xl bg-slate-950 hover:bg-slate-800 border-2 border-slate-800 hover:border-slate-700 text-sm font-semibold text-slate-200 transition flex items-center justify-between shadow-md";
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-xs">${String.fromCharCode(65 + idx)}</span>
+                        <span>${opt.text}</span>
+                    </span>
+                    <i class="fa-regular fa-circle text-slate-600 text-lg"></i>
+                `;
+                btn.onclick = () => selectOption(btn, opt.correct, q);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedBtn, isCorrect, questionObj) {
+            stopTimer();
+            const dogName = getDogName();
+
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const learnBox = document.getElementById('pibble-learning-box');
+            learnBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                setPibbleMood('happy');
+
+                selectedBtn.className = "option-btn w-full text-left p-4 rounded-2xl bg-emerald-950/80 border-2 border-emerald-500 text-sm font-semibold text-emerald-200 transition flex items-center justify-between shadow-lg";
+                selectedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400 text-xl";
+
+                const boneReward = questionObj.isCatChallenge ? 30 : 20;
+
+                if (!gameState.unlockedFacts.includes(questionObj.id)) {
+                    gameState.ecoBones += boneReward;
+                    gameState.unlockedFacts.push(questionObj.id);
+
+                    if (typeof confetti !== 'undefined') {
+                        confetti({
+                            particleCount: questionObj.isCatChallenge ? 80 : 50,
+                            spread: 60,
+                            origin: { y: 0.7 }
+                        });
+                    }
+                }
+
+                const replacedLearned = questionObj.pibbleLearned.replace(/Pibble/g, dogName);
+
+                learnBox.className = "mt-4 p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-xs md:text-sm text-emerald-200 shadow-lg";
+                learnBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold font-fun text-emerald-300 mb-1 text-base">
+                        <i class="fa-solid fa-award"></i> ${questionObj.isCatChallenge ? '¡RESPUESTA RÁPIDA CORRECTA!' : `¡Lección Comprendida por ${dogName}!`} (+${boneReward} Huesitos 🦴)
+                    </div>
+                    <p class="mb-2">${questionObj.explanation}</p>
+                    <div class="p-2.5 rounded-xl bg-slate-950/80 border border-emerald-500/30 text-amber-300 font-semibold text-xs flex items-center gap-2">
+                        <span>💡</span> <span>${dogName} aprendió: "${replacedLearned}"</span>
+                    </div>
+                `;
+
+            } else {
+                playSound('wrong');
+                setPibbleMood('sad');
+
+                selectedBtn.className = "option-btn w-full text-left p-4 rounded-2xl bg-rose-950/80 border-2 border-rose-500 text-sm font-semibold text-rose-200 transition flex items-center justify-between shadow-lg";
+                selectedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400 text-xl";
+
+                learnBox.className = "mt-4 p-4 rounded-2xl bg-rose-950/50 border border-rose-500/40 text-xs md:text-sm text-rose-200 shadow-lg";
+                learnBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold font-fun text-rose-300 mb-1 text-base">
+                        <i class="fa-solid fa-circle-info"></i> ${questionObj.isCatChallenge ? '¡El intruso nos desconcentró!' : `¡Ups! ${dogName} aún tiene dudas:`}
+                    </div>
+                    <p>${questionObj.explanation}</p>
+                `;
+            }
+
+            document.getElementById('stat-bones').innerText = gameState.ecoBones;
+            const knowledgePercent = Math.round((gameState.unlockedFacts.length / questionsDB.length) * 100);
+            document.getElementById('stat-knowledge').innerText = `${knowledgePercent} %`;
+
+            document.getElementById('btn-next-question').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (gameState.currentQuestionIdx < questionsDB.length - 1) {
+                gameState.currentQuestionIdx++;
+                renderCurrentQuestion();
+            } else {
+                renderGameCompletionScreen();
+            }
+        }
+
+        function renderGameCompletionScreen() {
+            stopTimer();
+            setPibbleMood('proud');
+            const dogName = getDogName();
+
+            if (typeof confetti !== 'undefined') {
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+            }
+
+            document.getElementById('question-category').innerText = "¡Graduación Eco!";
+            document.getElementById('pibble-speech').innerText = `"¡GUAU GUAU GUAU! 🎓 ¡Completamos las 15 lecciones sobre reciclaje y medio ambiente! Ahora soy un Perro Reciclador Certificado gracias a ti."`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col items-center text-center p-8 bg-gradient-to-b from-amber-500/20 via-slate-900 to-slate-950 rounded-3xl border-2 border-amber-400 shadow-2xl">
+                    <span class="text-6xl mb-3 animate-bounce">🏆</span>
+                    <h3 class="text-2xl md:text-3xl font-extrabold font-fun text-amber-300 mb-2">¡Felicidades, Maestro Eco!</h3>
+                    <p class="text-sm md:text-base text-slate-300 mb-6 max-w-md">
+                        Enseñaste a <strong>${dogName}</strong> todo lo necesario para reciclar plástico, vidrio, cartón, aceite y proteger el mar.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button onclick="switchTab('wardrobe')" class="px-6 py-3 bg-lime-500 hover:bg-lime-400 text-slate-950 font-bold font-fun rounded-2xl shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-palette"></i> Ir a Vestir a ${dogName}
+                        </button>
+                        <button onclick="resetGamePrompt()" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold font-fun rounded-2xl shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i> Repetir Lecciones
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('btn-next-question').classList.add('hidden');
+        }
+
+        function resetGamePrompt() {
+            gameState.hasStarted = false;
+            gameState.currentQuestionIdx = 0;
+            renderCurrentQuestion();
+        }
+
+        // Wardrobe Logic
+        function renderBreedAndColorSelectors() {
+            const breedGrid = document.getElementById('breed-selector-grid');
+            if (breedGrid) {
+                breedGrid.innerHTML = '';
+                Object.values(breedsDB).forEach(b => {
+                    const isSelected = gameState.currentBreed === b.id;
+                    const card = document.createElement('button');
+                    card.onclick = () => selectBreed(b.id);
+                    card.className = `p-3 rounded-2xl border-2 transition text-left flex flex-col items-center justify-center text-center ${isSelected ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-lg scale-105' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`;
+                    card.innerHTML = `
+                        <span class="text-3xl mb-1">${b.emoji}</span>
+                        <span class="font-bold font-fun text-xs block mb-0.5">${b.name}</span>
+                        <span class="text-[10px] text-slate-400 leading-tight">${b.breedTitle.split(' ')[0]}</span>
+                    `;
+                    breedGrid.appendChild(card);
+                });
+            }
+
+            const furGrid = document.getElementById('fur-color-grid');
+            if (furGrid) {
+                furGrid.innerHTML = '';
+                Object.entries(furColorPalettes).forEach(([key, p]) => {
+                    const isSelected = gameState.currentFurColor === key;
+                    const btn = document.createElement('button');
+                    btn.onclick = () => selectFurColor(key);
+                    btn.className = `px-3 py-2 rounded-xl border text-xs font-bold font-fun transition flex items-center gap-2 ${isSelected ? 'bg-amber-400 text-slate-950 border-amber-300 shadow' : 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800'}`;
+                    
+                    const colorCircle = p.main ? `<span class="w-4 h-4 rounded-full border border-slate-500" style="background:${p.main}"></span>` : `<span class="w-4 h-4 rounded-full border border-slate-500 bg-gradient-to-r from-amber-500 via-stone-200 to-amber-800"></span>`;
+                    btn.innerHTML = `${colorCircle} <span>${p.name}</span>`;
+                    furGrid.appendChild(btn);
+                });
+            }
+        }
+
+        function selectBreed(breedId) {
+            gameState.currentBreed = breedId;
+            playSound('bark');
+            updateUIStrings();
+            renderDogSVG();
+            renderBreedAndColorSelectors();
+        }
+
+        function selectFurColor(colorKey) {
+            gameState.currentFurColor = colorKey;
+            playSound('bark');
+            renderDogSVG();
+            renderBreedAndColorSelectors();
+        }
+
+        function updateUIStrings() {
+            const dogName = getDogName();
+            const breedInfo = breedsDB[gameState.currentBreed];
+
+            document.getElementById('app-title-header').innerText = `${dogName} Reciclador`;
+            document.getElementById('app-subtitle-header').innerText = `¡Enseña a tu ${dogName} (${breedInfo.name}) a cuidar el planeta!`;
+            document.getElementById('hero-avatar-icon').innerText = breedInfo.emoji;
+
+            document.getElementById('ai-title-header').innerText = `El Olfato IA de ${dogName} (Gemini)`;
+            document.getElementById('ai-idle-text').innerText = `Escribe un objeto arriba y ${dogName} activará su Olfato Ecológico Inteligente.`;
+            document.getElementById('ai-loading-text').innerText = `${dogName} está investigando con su Olfato IA...`;
+
+            if (gameState.hasStarted) {
+                const q = questionsDB[gameState.currentQuestionIdx];
+                const replacedSpeech = q.speech.replace(/Pibble/g, dogName);
+                document.getElementById('pibble-speech').innerText = `"${replacedSpeech}"`;
+            } else {
+                document.getElementById('pibble-speech').innerText = `"¡Hola amigo humano! Soy ${dogName} ${breedInfo.emoji}. Tengo listo mi chalequito de reciclador porque quiero aprender a cuidar nuestro planeta. ¡Acompáñame en mis lecciones para convertirme en un perro reciclador profesional! 🌿"`;
+            }
+        }
+
+        function renderWardrobe() {
+            renderBreedAndColorSelectors();
+
+            const grid = document.getElementById('wardrobe-grid');
+            grid.innerHTML = '';
+            document.getElementById('wardrobe-bones-counter').innerText = gameState.ecoBones;
+
+            wardrobeStore.forEach(item => {
+                const isOwned = gameState.unlockedEquip.includes(item.id);
+                const isEquipped = gameState.currentEquip === item.id;
+                const canAfford = gameState.ecoBones >= item.cost;
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between shadow-lg";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-4xl">${item.icon}</span>
+                            ${isEquipped ? '<span class="text-xs font-bold px-2.5 py-1 rounded-full bg-lime-500/20 text-lime-300 border border-lime-500/40">Equipado</span>' : ''}
+                        </div>
+                        <h3 class="font-bold text-lg font-fun text-white mb-1">${item.name}</h3>
+                        <p class="text-xs text-slate-400 mb-4 leading-relaxed">${item.desc}</p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-900 flex items-center justify-between gap-2">
+                        <span class="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-bone text-lime-400"></i> ${item.cost} Huesitos
+                        </span>
+                        
+                        ${isOwned ? `
+                            <button onclick="equipItem('${item.id}')" ${isEquipped ? 'disabled' : ''} class="px-4 py-2 rounded-xl text-xs font-bold font-fun transition ${isEquipped ? 'bg-slate-800 text-slate-500 cursor-default' : 'bg-amber-500 hover:bg-amber-400 text-slate-950 cursor-pointer'}">
+                                ${isEquipped ? 'Puesto' : 'Equipar'}
+                            </button>
+                        ` : `
+                            <button onclick="buyItem('${item.id}', ${item.cost})" ${!canAfford ? 'disabled' : ''} class="px-4 py-2 rounded-xl text-xs font-bold font-fun transition ${canAfford ? 'bg-lime-500 hover:bg-lime-400 text-slate-950 cursor-pointer' : 'bg-slate-800 text-slate-600 cursor-not-allowed'}">
+                                Comprar
+                            </button>
+                        `}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function buyItem(id, cost) {
+            if (gameState.ecoBones >= cost && !gameState.unlockedEquip.includes(id)) {
+                gameState.ecoBones -= cost;
+                gameState.unlockedEquip.push(id);
+                gameState.currentEquip = id;
+                playSound('correct');
+                renderDogSVG();
+                renderWardrobe();
+            }
+        }
+
+        function equipItem(id) {
+            gameState.currentEquip = id;
+            renderDogSVG();
+            renderWardrobe();
+            playSound('bark');
+        }
+
+        function renderNotebook() {
+            const grid = document.getElementById('notebook-grid');
+            grid.innerHTML = '';
+            const dogName = getDogName();
+
+            document.getElementById('notebook-count-badge').innerText = `${gameState.unlockedFacts.length} / ${questionsDB.length} Lecciones`;
+
+            questionsDB.forEach(q => {
+                const isUnlocked = gameState.unlockedFacts.includes(q.id);
+                const card = document.createElement('div');
+                const replacedLearned = q.pibbleLearned.replace(/Pibble/g, dogName);
+
+                if (isUnlocked) {
+                    card.className = "bg-slate-950 border border-amber-500/40 rounded-2xl p-4 flex flex-col justify-between shadow-lg";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl">${q.badgeIcon}</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${q.isCatChallenge ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                                    ${q.axis}
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-amber-300 font-fun text-base mb-1">${q.category}</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">${replacedLearned}</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-900 text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                            <i class="fa-solid fa-check"></i> Aprendido por ${dogName}
+                        </div>
+                    `;
+                } else {
+                    card.className = "bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between opacity-60";
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-2xl opacity-40">🔒</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-500">
+                                    Lección ${q.id}
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-slate-500 font-fun text-base mb-1">${q.category}</h4>
+                            <p class="text-xs text-slate-600">Completa esta lección para registrar la sabiduría de tu perrito.</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-900 text-[11px] text-slate-600">
+                            Responde la pregunta ${q.id} para desbloquear.
+                        </div>
+                    `;
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function setAiInput(text) {
+            document.getElementById('ai-input').value = text;
+            askPibbleAI();
+        }
+
+        async function askPibbleAI() {
+            const query = document.getElementById('ai-input').value.trim();
+            if (!query) return;
+
+            const dogName = getDogName();
+            const breedTitle = getDogBreedTitle();
+
+            const idle = document.getElementById('ai-idle');
+            const loading = document.getElementById('ai-loading');
+            const result = document.getElementById('ai-result');
+
+            idle.classList.add('hidden');
+            result.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            const systemPrompt = `Eres ${dogName}, un perrito de raza ${breedTitle} que viste un traje de reciclador y está aprendiendo a cuidar el planeta. Responde con entusiasmo de perrito reciclador educado. Analiza el residuo o elemento indicado por el usuario y proporciona en español:
+1. 🐶 **¿Qué Contenedor / Destino le corresponde?** (Orgánico, AMARILLO Plásticos/Metales, AZUL Papel/Cartón, VERDE Vidrio, o Punto Limpio).
+2. 🦴 **¿Qué material es y cómo se procesa?** (Explicación breve de 2 oraciones sobre qué es y dónde llega).
+3. 🐾 **¿En qué ayuda al planeta?** (Cómo ahorra energía, recursos o evita contaminación).`;
+
+            const userPrompt = `${dogName}, encontré este objeto: "${query}". ¿En qué contenedor va, a dónde llega y en qué ayuda al planeta si lo reciclo?`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+
+                const data = await response.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "¡Woof! No pude olfatear bien este objeto. ¡Intenta de nuevo!";
+
+                loading.classList.add('hidden');
+                result.classList.remove('hidden');
+
+                result.innerHTML = `
+                    <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-800">
+                        <span class="text-3xl">${breedsDB[gameState.currentBreed].emoji}🔎</span>
+                        <div>
+                            <h3 class="font-bold text-lg font-fun text-amber-300">${dogName} olfateó: "${query}"</h3>
+                            <span class="text-xs text-slate-400 font-medium">Olfato Eco Inteligente por Gemini AI</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-200 leading-relaxed space-y-2">
+                        ${text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-300 font-semibold">$1</strong>').replace(/\n/g, '<br>')}
+                    </div>
+                `;
+
+            } catch (err) {
+                console.error("AI Fetch Error:", err);
+                loading.classList.add('hidden');
+                result.classList.remove('hidden');
+                result.innerHTML = `
+                    <div class="text-rose-400 text-sm p-3">
+                        <p class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ¡Woof! Error de conexión con la IA.</p>
+                        <p>Verifica tu conexión para consultar con el Olfato de ${dogName}.</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.onload = function() {
+            setTheme('theme-slate');
+            updateUIStrings();
+            renderDogSVG();
+            renderCurrentQuestion();
+        };
+    </script>
+</body>
+</html>
